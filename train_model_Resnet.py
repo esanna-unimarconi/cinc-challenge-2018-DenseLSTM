@@ -431,6 +431,12 @@ def loaddata(record_name):
 
 def preprocess_record(record_name):
     (X_train, y_train, recordLength,arousals_originale) = loaddata(record_name)
+
+    # Ignore records that do not contain any arousals
+    if 1 not in arousals_originale:
+        L.log_info('no arousals found in %s\n' % record_name)
+        return
+
     model, arousals, predictions = model_eval(X_train, y_train, p_INPUT_FEAT, p_OUTPUT_CLASS, record_name, recordLength)
 
 
