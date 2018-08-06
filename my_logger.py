@@ -22,7 +22,7 @@ def init_logger(filename):
     logging.basicConfig(filename="logs/" + str(filename),
                     level=logging.DEBUG,
                     format='%(levelname)s: %(asctime)s %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S')
+                    datefmt='%m/%d/%Y %H:%M:%S')
 
 def log_info(message):
     print(message)

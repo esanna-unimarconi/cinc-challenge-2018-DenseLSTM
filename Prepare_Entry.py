@@ -72,6 +72,11 @@ def score_training_set():
         record_name = tr_files.header.values[i][:-4]
         predictions, pred_arousal_probabilities = T.classify_record(record_name)
 
+        # save also training predictions to evaluate voting solutions between different models
+        output_file = "training_output/" + os.path.basename(record_name) + '.vec'
+        L.log_info("Salvo i files esito del training in " + str(output_file))
+        np.savetxt(output_file, pred_arousal_probabilities, fmt='%.3f')
+
         arousals = phyc.import_arousals(tr_files.arousal.values[i])
         arousals = np.ravel(arousals)
 
@@ -82,11 +87,6 @@ def score_training_set():
         auroc = score.record_auroc(record_name)
         auprc = score.record_auprc(record_name)
         L.log_info(' AUROC:%f AUPRC:%f' % (auroc, auprc))
-
-        # save also training predictions to evaluate voting solutions between different models
-        output_file = "training_output/" + os.path.basename(record_name) + '.vec'
-        L.log_info("Salvo i files esito del training in " + str(output_file))
-        np.savetxt(output_file, pred_arousal_probabilities, fmt='%.3f')
 
     L.log_info("\n\r")
     auroc_g = score.gross_auroc()

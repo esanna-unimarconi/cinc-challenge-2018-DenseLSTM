@@ -88,13 +88,13 @@ def import_arousals(file_name):
     try:
         f = h5py.File(file_name, 'r')
         arousals = numpy.array(f['data']['arousals'])
-        arousals = arousals[220000:230000]
+        arousals = arousals[200000:1200000]
     except:
         arousals=None
     return arousals
 
 def import_signals(file_name):
-    return np.transpose(scipy.io.loadmat(file_name)['val'])[220000:230000]
+    return np.transpose(scipy.io.loadmat(file_name)['val'])[200000:1200000]
 
 # -----------------------------------------------------------------------------
 # Take a header file as input, and returns the names of the signals
@@ -140,19 +140,25 @@ def get_subject_data_test(signal_file, signal_names):
 # -----------------------------------------------------------------------------
 #  Transform data to matrix of windows_size_length
 # -----------------------------------------------------------------------------
-def signalsToMatrix(data, arousal,recordLength,WINDOW_SIZE):
+def signalsToMatrix(data, arousal,recordLength,WINDOW_SIZE, INPUT_FEAT):
     #recordLength = data.size
     # the number of samples is the entire part of the division between window_size and record length
     #print(str(recordLength))
     a=int(recordLength)
     b = int(WINDOW_SIZE)
     samples = int(int(recordLength) / int(WINDOW_SIZE))
-    trainset = np.zeros((samples, WINDOW_SIZE))
+    trainset = np.zeros((samples, WINDOW_SIZE, INPUT_FEAT))
     traintarget = np.zeros((samples, 3))
 
     for i in range(1, samples):
+       # print("data.shape: "+str(data.shape))
+        #print("data[0].shape: " + str(data[0].shape))
+        #print("i:"+str(i))
+        #print("samples:" + str(samples))
         sample_from = i * WINDOW_SIZE;
-        trainset[i] = data[sample_from:sample_from + WINDOW_SIZE][0]
+        #print("sample_from:" + str(sample_from))
+        #print("WINDOW_SIZE:" + str(WINDOW_SIZE))
+        trainset[i] = data[sample_from:sample_from + WINDOW_SIZE]#[0]
         arousalArray = arousal[sample_from:sample_from + WINDOW_SIZE]
         arousalLabels = np.zeros((WINDOW_SIZE, 3))
 
