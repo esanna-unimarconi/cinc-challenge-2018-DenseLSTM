@@ -32,32 +32,36 @@ p_DATASET_DIR='/opt/PHYSIONET/ch2018_mini'
 # returns a list of the training and testing file locations for easier import
 # -----------------------------------------------------------------------------
 def get_files():
-    print("eseguo phic get files")
+    if os.name == 'nt':
+        sep="\\" #windows
+    else:
+        sep = "/" #unix, MacOs, Java, others
     header_loc, arousal_loc, signal_loc, is_training = [], [], [], []
-    #rootDir = '.' esanna
     rootDir = p_DATASET_DIR
-    for dirName, subdirList, fileList in os.walk(rootDir, followlinks=True):  #sorted(
-        if dirName != '.' and dirName != './test' and dirName != './training':
-            if dirName.startswith(rootDir+'/training/'):
+    print("eseguo phic get files: " + str(rootDir))
+    for dirName, subdirList, fileList in sorted(os.walk(rootDir, followlinks=True)):  #sorted(
+        if dirName != rootDir and dirName != rootDir+sep+'test' and dirName != rootDir+sep+'training':
+            if dirName.startswith(rootDir+''+sep+'training'+sep+''):
                 is_training.append(True)
-
+                #print("TRAIN### :   "+dirName)
                 for fname in fileList:
                     if '.hea' in fname:
-                        header_loc.append(dirName + '/' + fname)
+                        header_loc.append(dirName + sep + fname)
                     if '-arousal.mat' in fname:
-                        arousal_loc.append(dirName + '/' + fname)
+                        arousal_loc.append(dirName + sep + fname)
                     if 'mat' in fname and 'arousal' not in fname:
-                        signal_loc.append(dirName + '/' + fname)
+                        signal_loc.append(dirName + sep + fname)
 
-            elif dirName.startswith(rootDir+'/test/'):
+            elif dirName.startswith(rootDir+''+sep+'test'+sep+''):
                 is_training.append(False)
+                #print("TEST### :   " + dirName)
                 arousal_loc.append('')
 
                 for fname in fileList:
                     if '.hea' in fname:
-                        header_loc.append(dirName + '/' + fname)
+                        header_loc.append(dirName + sep + fname)
                     if 'mat' in fname and 'arousal' not in fname:
-                        signal_loc.append(dirName + '/' + fname)
+                        signal_loc.append(dirName + sep + fname)
 
     # combine into a data frame
     data_locations = {'header':      header_loc,
@@ -66,6 +70,7 @@ def get_files():
                       'is_training': is_training
                       }
 
+    #print (data_locations)
     # Convert to a data-frame
     df = pd.DataFrame(data=data_locations)
 
@@ -77,7 +82,6 @@ def get_files():
     testing_files  = df.loc[te_ind, :]
 
     return training_files, testing_files
-
 # -----------------------------------------------------------------------------
 # import the outcome vector, given the file name.
 # e.g. /training/tr04-0808/tr04-0808-arousal.mat
